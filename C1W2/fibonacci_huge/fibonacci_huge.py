@@ -20,10 +20,15 @@ def get_fibonacci_huge(n, m):
 
     f0=0
     f1=1
-    for i in range(0,x-1):
-        f2=(f0+f1)%m
-        f0=f1
-        f1=f2
+    if x==0:
+        return f0%m
+    elif x==1:
+        return f1%m
+    else:
+        for i in range(0,x-1):
+            f2=(f0+f1)%m
+            f0=f1
+            f1=f2
 
     return f2 % m
 
