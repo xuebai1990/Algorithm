@@ -7,19 +7,22 @@ def get_optimal_value(capacity, weights, values):
     for i in range(0,n):
         vw.append(float(values[i])/weights[i])
 
-    for i in range(0,n-2):
-        for j in range(i,n-1):
-            if vw[j]<vw[j+1]:
-                tmp=vw[j]
-                vw[j]=vw[j+1]
-                vw[j+1]=vw[j]
-                tmp=values[j]
-                values[j]=values[j+1]
-                values[j+1]=tmp
-                tmp=weights[j]
-                weights[j]=weights[j+1]
-                weights[j+1]=tmp               
- 
+    for i in range(0,n-1):
+        for j in range(n-1,i,-1):
+            if vw[j-1]<vw[j]:
+#                tmp=vw[j-1]
+#                vw[j-1]=vw[j]
+#                vw[j]=vw[j-1]
+#                tmp=values[j-1]
+#                values[j-1]=values[j]
+#                values[j]=tmp
+#                tmp=weights[j-1]
+#                weights[j-1]=weights[j]
+#                weights[j]=tmp               
+                vw[j-1],vw[j]=vw[j],vw[j-1]
+                values[j-1],values[j]=values[j],values[j-1]
+                weights[j-1],weights[j]=weights[j],weights[j-1] 
+
     sw=0.0   
     for i in range(0,n):
         if sw<capacity:
