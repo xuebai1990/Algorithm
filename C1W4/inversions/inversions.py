@@ -9,7 +9,24 @@ def get_number_of_inversions(a, b, left, right):
     number_of_inversions += get_number_of_inversions(a, b, left, ave)
     number_of_inversions += get_number_of_inversions(a, b, ave, right)
     #write your code here
+    number_of_inversions += merge(a, b, left, ave, right)
+    for i in range(left,right):
+        a[i]=b[i]   
     return number_of_inversions
+
+def merge(a, b, left, ave, right):
+    num = 0
+    i0=left
+    i1=ave
+    for i in range(left,right):
+        if i0<ave and (i1>=right or a[i0]<=a[i1]):
+            b[i]=a[i0]
+            i0=i0+1
+        else:
+            b[i]=a[i1]
+            i1=i1+1
+            num = num + (ave - i0)      
+    return num
 
 if __name__ == '__main__':
     input = sys.stdin.read()
