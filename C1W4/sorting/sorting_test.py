@@ -10,9 +10,9 @@ def partition3(a, l, r):
             return l, r
 
     x = a[l]
-    lt = l
+    lt = l + 1
     rt = r
-    i = l
+    i = l + 1
 
     while i <= rt:
         if a[i] < x:
@@ -25,8 +25,8 @@ def partition3(a, l, r):
         else:
             i += 1
 
-    a[l], a[lt] = a[lt], a[l]
-    return lt, rt
+    a[l], a[lt - 1] = a[lt - 1], a[l]
+    return lt - 1, rt
 
 def partition2(a, l, r):
     x = a[l]
