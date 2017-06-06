@@ -29,28 +29,45 @@ def merge(a, b, c, d, l, ave, r):
             i1 = i1 + 1
     return
 
-def partition2(a, b, l, r):
-    x = a[l]
-    j = l;
-    for i in range(l + 1, r):
-        if a[i] <= x:
-            j += 1
-            a[i], a[j] = a[j], a[i]
-            b[i], b[j] = b[j], b[i]
-    a[l], a[j] = a[j], a[l]
-    b[l], b[j] = b[j], b[l]
-    return j
+def partition3(a, b, l, r):
+    #write your code here
+    if r - l <= 1:
+        if a[l] > a[r]:
+            a[l], a[r] = a[r], a[l]
+            b[l], b[r] = b[r], b[l]
+            return l, r
 
+    x = a[l]
+    lt = l + 1
+    rt = r
+    i = l + 1
+
+    while i <= rt:
+        if a[i] < x:
+            a[i], a[lt] = a[lt], a[i]
+            b[i], b[lt] = b[lt], b[i]
+            lt += 1
+            i += 1
+        elif a[i] > x:
+            a[i], a[rt] = a[rt], a[i]
+            b[i], b[rt] = b[rt], b[i]
+            rt -= 1
+        else:
+            i += 1
+
+    a[l], a[lt - 1] = a[lt - 1], a[l]
+    b[l], b[lt - 1] = b[lt - 1], b[l]
+    return lt - 1, rt
 
 def randomized_quick_sort(a, b, l, r):
     if l >= r:
         return
-    k = random.randint(l, r - 1)
+    k = random.randint(l, r)
     a[l], a[k] = a[k], a[l]
     b[l], b[k] = b[k], b[l]
-    m = partition2(a, b, l, r)
-    randomized_quick_sort(a, b, l, m);
-    randomized_quick_sort(a, b, m + 1, r);
+    m, n = partition3(a, b, l, r)
+    randomized_quick_sort(a, b, l, m - 1);
+    randomized_quick_sort(a, b, n + 1, r);
 
 def dis(xx1, yy1, xx2, yy2):
     return (xx1 - xx2)**2+(yy1 - yy2)**2
@@ -108,6 +125,6 @@ if __name__ == '__main__':
     y2 = y
     xx = n * [0]
     yy = n * [0]
-    sort(x1, y1, xx, yy, 0, len(x1))
-    sort(y2, x2, yy, xx, 0, len(y2))
+    randomized_quick_sort(x1, y1, 0, len(x1) - 1)
+    randomized_quick_sort(y2, x2, 0, len(y2) - 1)
     print("{0:.9f}".format(math.sqrt(minimum_distance(x1, y1, x2, y2, 0, len(x1)))))
