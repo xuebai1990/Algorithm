@@ -17,7 +17,18 @@ class Buffer:
 
     def Process(self, request):
         # write your code here
-        return Response(False, -1)
+        n = len(self.finish_time_)
+        while n > 0 and request.arrival_time >= self.finish_time_[0]:
+            self.finish_time_.pop(0)
+            n = len(self.finish_time_)
+        if n == 0:
+            self.finish_time_.append(request.arrival_time + request.process_time)
+            return Response(False, request.arrival_time)
+        elif n >= self.size:
+            return Response(True, -1)
+        else:
+            self.finish_time_.append(self.finish_time_[n - 1] + request.process_time)
+            return Response(False, self.finish_time_[n - 1])
 
 def ReadRequests(count):
     requests = []
