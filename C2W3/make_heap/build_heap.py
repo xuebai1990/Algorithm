@@ -23,21 +23,24 @@ class HeapBuilder:
     # but in the worst case gives a quadratic number of swaps.
     #
     # TODO: replace by a more efficient implementation
-    n = len(self._data) // 2
+    m = len(self._data)
+    n = m // 2
     for i in range(n - 1, -1, -1):
       j = i
       while j <= n - 1:
-        x = min(self._data[j], self._data[2 * j + 1], self._data[2 * j + 2])
-        if x == self._data[2 * j + 1]:
-          self._swaps.append((j, 2 * j + 1))
-          self._data[j], self._data[2 * j + 1] = self._data[2 * j + 1], self._data[j]
-          j = 2 * j + 1
-        elif x == self._data[2 * j + 2]:
-          self._swaps.append((j, 2 * j + 2))
-          self._data[j], self._data[2 * j + 2] = self._data[2 * j + 2], self._data[j]
-          j = 2 * j + 2
-        else: 
+        maxid = j
+        l = 2 * j + 1
+        if l < m and self._data[l] < self._data[maxid]:
+          maxid = l
+        r = 2 * j + 2 
+        if r < m and self._data[r] < self._data[maxid]:
+          maxid = r
+        if j == maxid:
           break
+        else:
+          self._swaps.append((j, maxid))
+          self._data[j], self._data[maxid] = self._data[maxid], self._data[j]
+          j = maxid
 
   def Solve(self):
     self.ReadData()
