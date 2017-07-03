@@ -1,8 +1,4 @@
 # python3
-import random
-import sys, threading
-sys.setrecursionlimit(10**7) # max depth of recursion
-threading.stack_size(2**27)  # new thread will get stack of such size
 
 class JobQueue:
     def read_data(self):
@@ -14,57 +10,47 @@ class JobQueue:
         for i in range(len(self.jobs)):
           print(self.assigned_workers[i], self.start_times[i]) 
 
-    def siftdown(self, i):
-        n = self.num_workers // 2
+    def siftdown(self, i, a, b, n):
         j = i
-        while j <= n - 1:
+        nn = n // 2
+        while j <= nn - 1:
             maxid = j
             l = 2 * j + 1
-            if l < self.num_workers and self.nft[l] < self.nft[maxid]:
+            if l < n and a[l] < a[maxid]:
                 maxid = l
             r = 2 * j + 2
-            if r < self.num_workers and self.nft[r] < self.nft[maxid]:
+            if r < n and a[r] < a[maxid]:
                 maxid = r
             if j == maxid:
                 break
             else:
-                self.nft[j], self.nft[maxid] = self.nft[maxid], self.nft[j]
-                self.ind[j], self.ind[maxid] = self.ind[maxid], self.ind[j]
+                a[j], a[maxid] = a[maxid], a[j]
+                b[j], b[maxid] = b[maxid], b[j]
                 j = maxid
 
-    def partition2(self, a, b, l, r):
-        x = a[l]
-        j = l
-        for i in range(l + 1, r + 1):
-            if a[i] <= x:
-                j += 1
-                a[i], a[j] = a[j], a[i]
-                b[i], b[j] = b[j], b[i]
-        a[l], a[j] = a[j], a[l]
-        b[l], b[j] = b[j], b[l]
-        return j
+    def heap_sort(self, a, b):
+        n = len(a)
+        n2 = n // 2
+        for i in range(n2 - 1, -1, -1):
+            self.siftdown(i, a, b, n)
+        nn = n
+        for i in range(n - 1):
+            a[0], a[nn - 1] = a[nn - 1], a[0]
+            b[0], b[nn - 1] = b[nn - 1], b[0]
+            nn = nn - 1
+            self.siftdown(0, a, b, nn)
 
-    def randomized_quick_sort(self, a, b, l, r):
-        if l >= r:
-            return
-        k = random.randint(l, r)
-        a[l], a[k] = a[k], a[l]
-        b[l], b[k] = b[k], b[l]
-        m = self.partition2(a, b, l, r)
-        self.randomized_quick_sort(a, b, l, m);
-        self.randomized_quick_sort(a, b, m + 1, r);
-
-    def find_free_node(self, i, key):
+    def find_free_node(self, i, key, a, b):
         child1 = 2 * i + 1
         child2 = 2 * i + 2
         if child1 < self.num_workers and self.nft[child1] == key:
-            self.fn.append(self.ind[child1])
-            self.fi.append(child1)
-            self.find_free_node(child1, key)
+            a.append(self.ind[child1])
+            b.append(child1)
+            self.find_free_node(child1, key, a, b)
         if child2 < self.num_workers and self.nft[child2] == key:
-            self.fn.append(self.ind[child2])
-            self.fi.append(child2)
-            self.find_free_node(child2, key) 
+            a.append(self.ind[child2])
+            b.append(child2)
+            self.find_free_node(child2, key, a, b) 
 
     def assign_jobs(self):
         # TODO: replace this code with a faster algorithm.
@@ -76,23 +62,26 @@ class JobQueue:
           self.ind.append(i)
         i = 0
         while i < len(self.jobs):
-          self.fn = []
-          self.fi = []
+          fn = []
+          fi = []
           key = self.nft[0]
-          self.fn.append(self.ind[0])
-          self.fi.append(0)
-          self.find_free_node(0, key)
-          arrayfn = self.fn
-          arrayfi = self.fi
-          self.randomized_quick_sort(arrayfn, arrayfi, 0, len(arrayfn) - 1)
-          for j in range(len(arrayfn)):
-            self.assigned_workers[i] = arrayfn[j]
-            self.start_times[i] = self.nft[arrayfi[j]]
-            self.nft[arrayfi[j]] = self.nft[arrayfi[j]] + self.jobs[i]
+          fn.append(self.ind[0])
+          fi.append(0)
+          self.find_free_node(0, key, fn, fi)
+          self.heap_sort(fn, fi)
+          j = len(fn) - 1
+          while j >= 0:
+            self.assigned_workers[i] = fn[j]
+            self.start_times[i] = self.nft[fi[j]]
+            self.nft[fi[j]] = self.nft[fi[j]] + self.jobs[i]
+            if self.jobs[i] != 0:
+              j -= 1
             i = i + 1
-          self.randomized_quick_sort(arrayfi, arrayfi, 0, len(arrayfi) - 1)
-          for j in range(len(arrayfi) - 1, -1, -1):
-            self.siftdown(arrayfi[j])
+            if i >= len(self.jobs):
+              break
+          self.heap_sort(fi, fn)
+          for j in range(len(fi)):
+            self.siftdown(fi[j], self.nft, self.ind, self.num_workers)
 
     def solve(self):
         self.read_data()
@@ -102,5 +91,5 @@ class JobQueue:
 
 if __name__ == '__main__':
     job_queue = JobQueue()
-    threading.Thread(target=job_queue.solve).start()
+    job_queue.solve()
 
